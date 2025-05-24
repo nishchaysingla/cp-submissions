@@ -92,7 +92,7 @@ bool chk(int i, int col, const vector<int>& queens) {
 
 void recur(int i , int n , vector<int>&queens){
     if(i==n){
-        ans +=1;
+        ans ++;
         return ;
     }
     for(int col = 0;col<n;col++){
