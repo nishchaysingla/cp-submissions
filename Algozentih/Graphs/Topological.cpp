@@ -65,28 +65,91 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     return a.first > b.first;
     // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
-vector<vector<int>>g,rev_g;
+vector<vector<int>>g;
+vector<int> topo;
+vector<int> vis;
+vector<int> indegree;
+bool cycle;
+void dfs(int node){
+    vis[node] = 1;
+    for(auto &neigh : g[node]){
+        if(!vis[neigh]){
+            dfs(neigh);
+        }
+        else{
+            cycle = true;
+        }
+    }
+    topo.push_back(node);
+    return;
+}
+int dp[100100];
+int recur(int node){
+    if(dp[node]!=-1)
+        return dp[node];
+
+    int ans = 1;
+    for(auto &neigh : g[node]){
+        ans = max(ans, 1 + recur(neigh));
+    }
+    return dp[node] = ans;
+}
 
 void solve(){
-    // cout << 5555 << endl;
     int n, m;
     cin >> n >> m;
     g.resize(n + 1);
-    rev_g.resize(n + 1);
-    vector<int> outdegree(n + 1,0);
-    vector<int> indegree(n + 1,0);
-    vector<int> vis(n + 1,0);
-
+    vis.assign(n + 1, 0);
+    indegree.assign(n + 1, 0);
     forn(i,m){
         int u, v;
         cin >> u >> v;
         g[u].push_back(v);
-        rev_g[v].push_back(u);
         indegree[v]++;
-        outdegree[u]++;
     }
-    vector<int> topo;
-    queue<int> q;
+    cycle = false;
+    for (int i = 1; i <= n;i++){
+        if(!vis[i]){
+            dfs(i);
+            if(cycle){
+                cout << "Cycle detected" << endl;
+                return;
+            }
+        }
+    }
+    reverse(all(topo));
+    for(auto &x : topo){
+        cout << x << " ";
+    }
+    cout << endl;
+    
+    //--------------------------------------------------//
+    // ! To find the longest path in topological ordering
+    // vis.assign(n + 1, 0); // -----> Not required
+    memset(dp, -1, sizeof(dp));
+
+    for (int i = 1; i <= n;i++){
+        if(!vis[i]){
+            cout << recur(i) << endl; // This will give the longest path starting from 'i'
+        }
+    }
+    //* Iterative dp
+    int f_ans = 0;
+    for(auto &node : topo){
+        int ans = 1;
+        for(auto &neigh : g[node]){
+            ans = max(ans, 1 + dp[neigh]); // Neighbours will be visited for sure, bcoz treversing in 
+                                    //    topological ordering
+        }
+        f_ans = max(ans, f_ans);
+        dp[node] = ans;
+    }
+    cout << f_ans << endl;
+
+
+    //^ Kahn's algo
+    //& Relax the indegrees of the nodes, and add to order when it is 0 for a node
+    queue<int>q;
     for (int i = 1; i <= n;i++){
         if(indegree[i]==0){
             q.push(i);
@@ -98,21 +161,11 @@ void solve(){
         topo.push_back(tp);
         for(auto &neigh : g[tp]){
             indegree[neigh]--;
-            if(indegree[neigh]==0){
+            if(indegree[neigh]==0)
                 q.push(neigh);
-            }
         }
     }
-    pr(topo);
-    vector<int> dp(n + 1, 0);
-    dp[1] = 1;
-    for(auto &node : topo){
-        for(auto &neigh : rev_g[node]){
-            dp[node] = (dp[node] + dp[neigh]) % M;
-        }
-    }
-    pr(dp);
-    cout << dp[n] % M << endl;
+
 }
 
 signed main(){

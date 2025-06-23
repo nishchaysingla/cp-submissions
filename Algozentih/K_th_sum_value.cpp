@@ -65,54 +65,47 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     return a.first > b.first;
     // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
-vector<vector<int>>g,rev_g;
-
+bool chk(int mid , vector<int>&v1,vector<int>&v2,int k,int n1,int n2){
+    int cnt = 0;
+    for (int i = 0; i < n1;i++){
+        if(v1[i]>mid){
+            break;
+        }
+        int f = mid - v1[i];
+        int nums = upper_bound(v2.begin(), v2.end(), f)-v2.begin();
+        cnt += nums;
+        if(cnt>=k){
+            return true;
+        }
+    }
+    return cnt >= k;
+}
 void solve(){
-    // cout << 5555 << endl;
-    int n, m;
-    cin >> n >> m;
-    g.resize(n + 1);
-    rev_g.resize(n + 1);
-    vector<int> outdegree(n + 1,0);
-    vector<int> indegree(n + 1,0);
-    vector<int> vis(n + 1,0);
-
-    forn(i,m){
-        int u, v;
-        cin >> u >> v;
-        g[u].push_back(v);
-        rev_g[v].push_back(u);
-        indegree[v]++;
-        outdegree[u]++;
+    int n1, n2, k;
+    cin >> n1 >> n2 >> k;
+    vector<int> v1(n1), v2(n2);
+    forn(i,n1){
+        cin >> v1[i];
     }
-    vector<int> topo;
-    queue<int> q;
-    for (int i = 1; i <= n;i++){
-        if(indegree[i]==0){
-            q.push(i);
+    forn(i,n2){
+        cin >> v2[i];
+    }
+    sort(all(v1));
+    sort(all(v2));
+    int lo = v1[0] + v2[0];
+    int hi = v1[n1 - 1] + v2[n2 - 1];
+    int ans = -1;
+    while(lo<=hi){
+        int mid = lo + (hi - lo) / 2;
+        if(chk(mid,v1,v2,k,n1,n2)){
+            ans = mid;
+            hi = mid - 1;
+        }
+        else{
+            lo = mid + 1;
         }
     }
-    while(!q.empty()){
-        int tp = q.front();
-        q.pop();
-        topo.push_back(tp);
-        for(auto &neigh : g[tp]){
-            indegree[neigh]--;
-            if(indegree[neigh]==0){
-                q.push(neigh);
-            }
-        }
-    }
-    pr(topo);
-    vector<int> dp(n + 1, 0);
-    dp[1] = 1;
-    for(auto &node : topo){
-        for(auto &neigh : rev_g[node]){
-            dp[node] = (dp[node] + dp[neigh]) % M;
-        }
-    }
-    pr(dp);
-    cout << dp[n] % M << endl;
+    cout << ans << endl;
 }
 
 signed main(){
@@ -122,7 +115,7 @@ signed main(){
     //     freopen("output.txt", "w", stdout);
     // #endif
     int _t=1;
-    // cin>>_t;
+    cin>>_t;
     while(_t--){
         solve();
     }

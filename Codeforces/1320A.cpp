@@ -65,62 +65,45 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     return a.first > b.first;
     // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
-vector<vector<int>>g,rev_g;
 
 void solve(){
-    // cout << 5555 << endl;
-    int n, m;
-    cin >> n >> m;
-    g.resize(n + 1);
-    rev_g.resize(n + 1);
-    vector<int> outdegree(n + 1,0);
-    vector<int> indegree(n + 1,0);
-    vector<int> vis(n + 1,0);
-
-    forn(i,m){
-        int u, v;
-        cin >> u >> v;
-        g[u].push_back(v);
-        rev_g[v].push_back(u);
-        indegree[v]++;
-        outdegree[u]++;
+    int n;
+    cin >> n;
+    vector<int> v(n), dp(n);
+    int ans = 0;
+    forn(i,n){
+        cin >> v[i];
+        ans = max(ans, v[i]);
+        dp[i] = v[i];
     }
-    vector<int> topo;
-    queue<int> q;
-    for (int i = 1; i <= n;i++){
-        if(indegree[i]==0){
-            q.push(i);
-        }
-    }
-    while(!q.empty()){
-        int tp = q.front();
-        q.pop();
-        topo.push_back(tp);
-        for(auto &neigh : g[tp]){
-            indegree[neigh]--;
-            if(indegree[neigh]==0){
-                q.push(neigh);
+    set<pair<int, int>> st;
+    for(int j = 1; j < n;j++){
+        st.insert({v[j-1],j-1});
+        auto it = st.rbegin();
+        auto bg = st.rend();
+        bool done = false;
+        int sz = st.size();
+        while(sz-- && it!=bg){
+            int value = it->first;
+            int i = it->second;
+            // cout << value << " " << i << endl;
+            if(v[j]>v[i] && v[j]-v[i]==j-i){
+                st.insert({value + v[j], j});
+                done = true;
+                ans = max(ans, value + v[j]);
+                break;
             }
+            ++it;
         }
+        
+        // pr(st);
     }
-    pr(topo);
-    vector<int> dp(n + 1, 0);
-    dp[1] = 1;
-    for(auto &node : topo){
-        for(auto &neigh : rev_g[node]){
-            dp[node] = (dp[node] + dp[neigh]) % M;
-        }
-    }
-    pr(dp);
-    cout << dp[n] % M << endl;
+    cout << ans << endl;
 }
+
 
 signed main(){
     Code
-    // #ifndef ONLINE_JUDGE
-    //     freopen("input.txt", "r", stdin);
-    //     freopen("output.txt", "w", stdout);
-    // #endif
     int _t=1;
     // cin>>_t;
     while(_t--){
