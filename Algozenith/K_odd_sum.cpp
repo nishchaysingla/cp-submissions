@@ -3,13 +3,13 @@
 #define int long long
 #define endl '\n'
 #define forn(i,n) for(int i = 0; i < n; i++)
-#define tk(n,v) forn(i,n){cin>>v[i];}
 #define Code ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
 #define all(vec) vec.begin(),vec.end()
-#define yo cout<<"YES"<<endl
-#define noo cout<<"NO"<<endl
+#define printy cout<<"YES"<<endl
+#define printn cout<<"NO"<<endl
 using namespace std;
 long double PI = acos(-1.0);
+typedef pair<int, int> pii;
 int M = 1e9 + 7;
 
 #ifdef DEBUG
@@ -67,28 +67,60 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
 
-vector<vector<int>>g;
-vector<int>vis;
-
 void solve(){
-    int n;
-    cin>>n;
-    g.resize(n+1);
-    forn(i,n-1){
-        int u,v;cin>>u>>v;
-        g[u].push_back(v);
-        g[v].push_back(u);
+    int n,k,d;
+    cin>>n>>k>>d;
+    vector<int>v(n),pre(n);
+    forn(i,n){
+        cin>>v[i];
     }
-    // pr(g);
-    int maxi = 0;
-    for(int i = 1;i<=n;i++){
-        // int(g[i].size())
-        // (int)g[i].size()
-        maxi = max(maxi,(int)g[i].size());
+    pre[0] = v[0];
+    for(int i= 1;i<n;i++){
+        pre[i] = pre[i-1] + v[i];
     }
-    cout<<maxi+1<<endl;
+    int odds = 0;
+    multiset<int>st;
+    int ans = -1e18;
+    int sum = 0;
+    int head = -1,tail = 0;
+    while(tail<n){
+        while(head+1<n && ((v[head+1]%2 && odds<k) || v[head+1]%2==0)){
+            if(v[head+1]%2){
+                odds++;
+            }
+            st.insert(pre[head+1]);
+            head++;
+        }
+        int base = 0;
+        if(tail>0){
+            base = pre[tail-1];
+        }
+        auto it = st.upper_bound(base+d);
+        if(it!=st.begin()){
+            it--;
+            ans = max(ans,*it-base);
+        }
+        if(tail>head){
+            tail++;
+            head = tail-1;
+        }
+        else{
+            if(v[tail]%2){
+                odds--;
+            }
+            auto it = st.find(pre[tail]);
+            st.erase(it);
+            tail++;
+        }
+    }
+    if(ans==-1e18){
+        cout<<"IMPOSSIBLE";
+    }
+    else{
+        cout<<ans<<endl;
+    }
+    
 }
-
 signed main(){
     Code
     // #ifndef ONLINE_JUDGE
@@ -96,7 +128,7 @@ signed main(){
     //     freopen("output.txt", "w", stdout);
     // #endif
     int _t=1;
-    // cin>>_t;
+    cin>>_t;
     while(_t--){
         solve();
     }

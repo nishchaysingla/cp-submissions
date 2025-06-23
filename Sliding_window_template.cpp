@@ -3,13 +3,13 @@
 #define int long long
 #define endl '\n'
 #define forn(i,n) for(int i = 0; i < n; i++)
-#define tk(n,v) forn(i,n){cin>>v[i];}
 #define Code ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
 #define all(vec) vec.begin(),vec.end()
-#define yo cout<<"YES"<<endl
-#define noo cout<<"NO"<<endl
+#define printy cout<<"YES"<<endl
+#define printn cout<<"NO"<<endl
 using namespace std;
 long double PI = acos(-1.0);
+typedef pair<int, int> pii;
 int M = 1e9 + 7;
 
 #ifdef DEBUG
@@ -67,28 +67,52 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
 
-vector<vector<int>>g;
-vector<int>vis;
-
 void solve(){
-    int n;
-    cin>>n;
-    g.resize(n+1);
-    forn(i,n-1){
-        int u,v;cin>>u>>v;
-        g[u].push_back(v);
-        g[v].push_back(u);
+    int n, k;
+    cin >> n >> k;
+    int arr[n];
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
     }
-    // pr(g);
-    int maxi = 0;
-    for(int i = 1;i<=n;i++){
-        // int(g[i].size())
-        // (int)g[i].size()
-        maxi = max(maxi,(int)g[i].size());
-    }
-    cout<<maxi+1<<endl;
-}
+    // head and tail
+    int tail = 0, head = -1;
 
+    // datastructure for the window
+	int cntzero = 0;
+	
+    // answer maintain
+    int ans = 0;
+
+    while (tail < n)
+    {
+        while (/*there is a next element to eat && we can eat*/ )
+        {
+            head++;
+            // include elemenet at head in the data structure
+
+        }
+       
+        
+        // update the answer for current start
+        
+        
+        // move start one step forward.
+        if (tail > head)    // keep it same for all question, it basically help to handle empty subarray
+        {
+            tail++;
+            head = tail - 1;  // representation of an empty subarray
+        }
+        else
+        {
+            // change data  structure because removing tail element
+            
+            tail++;
+        }
+    }
+
+    cout << ans << endl;
+}
 signed main(){
     Code
     // #ifndef ONLINE_JUDGE
