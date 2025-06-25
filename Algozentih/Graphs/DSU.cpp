@@ -12,6 +12,7 @@
 #define all(vec) vec.begin(),vec.end()
 #define yo cout<<"YES"<<endl
 #define noo cout<<"NO"<<endl
+#define pii pair<int,int>
 using namespace std;
 long double PI = acos(-1.0);
 int M = 1e9 + 7;
@@ -66,9 +67,84 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     }
     return a.first > b.first;
 };
+class UnionFind {
+private:
+    int n,sets;
+    vector<int> par,sz; 
 
+public:
+    explicit UnionFind(int a) : n(a), sets(a), par(a + 1), sz(a + 1, 1) {
+        rep(i, 1, n + 1) {
+            par[i] = i;
+        }
+    }
+
+    int find(int x) {
+        if (par[x] == x) return x;
+        return par[x] = find(par[x]);
+    }
+
+    void merge(int x, int y) {
+        int rx = find(x);
+        int ry = find(y);
+        if (rx == ry) return;
+        if (sz[rx] < sz[ry]) swap(rx, ry);
+
+        par[ry] = rx;
+        sz[rx] += sz[ry];
+        sets--;
+    }
+
+    void reset() {
+        sets = n;
+        rep(i, 1, n + 1) {
+            par[i] = i;
+            sz[i] = 1;
+        }
+    }
+
+    int count() const {return sets;}
+
+    bool connected(int x, int y) {return find(x) == find(y);}
+
+    void print() const {
+        rep(i, 1, n + 1) {
+            cout << i << " -> " << par[i] << endl;
+        }
+    }
+};
+
+vector<vector<pii>>g;
+vector<vector<int>>edges;
 void solve(){
-    
+    int n,m;cin>>n>>m;
+    g.resize(n+1);
+    // Kruskal's Algo
+    rep(i,0,m){
+        int u,v,w;cin>>u>>v>>w;
+        edges.push_back({w,u,v});
+        g[u].push_back({v,w});
+        g[v].push_back({u,w});
+    }
+    sort(all(edges));
+    int mst_cost = 0;
+    int cnt = 0;
+    UnionFind uf(n);
+    for(auto &v : edges){
+        int w = edges[0];
+        int u = edges[1];
+        int v = edges[2];
+        if(uf.find(u)!=uf.find(v)){     // These 2 nodes are not merges yet
+            mst_cost += w;
+            uf.merge(u,v);          // Merging them
+            cnt++;
+        }
+    }
+    if(cnt!=n-1){
+        cout<<-1<<endl;     // number of nodes used is less than n-1
+        return;             // Fully connected tree not formed
+    }
+    cout<<mst_cost<<endl;
 }
 
 signed main(){
