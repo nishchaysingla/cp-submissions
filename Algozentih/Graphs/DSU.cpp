@@ -130,10 +130,10 @@ void solve(){
     int mst_cost = 0;
     int cnt = 0;
     UnionFind uf(n);
-    for(auto &v : edges){
-        int w = edges[0];
-        int u = edges[1];
-        int v = edges[2];
+    for(auto &vv : edges){
+        int w = vv[0];
+        int u = vv[1];
+        int v = vv[2];
         if(uf.find(u)!=uf.find(v)){     // These 2 nodes are not merges yet
             mst_cost += w;
             uf.merge(u,v);          // Merging them
