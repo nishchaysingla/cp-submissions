@@ -66,51 +66,95 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     }
     return a.first > b.first;
 };
+#define pii pair<int,int>
+int n, m;
+vector<vector<pii>> g;
+vector<int> dis;
+vector<int> vis;
+#define vi vector<int>
+int cnt,mini;
 
-int n;
-vector<vector<int>> adj; 
-vector<bool> visited;
-vector<int> tin, low;
-int timer;
-vector<int> articulation_pts;
-vector<int> components; // No of components in intially connected graph if node "i" is deleted
 
-void dfs(int v,int p){
-    visited[v] = 1;
-    int children = 0;
-    tin[v] = low[v] = timer++;
-    for(auto  &to : adj[v]){
-        if(visited[to]){
-            low[v] = min(low[v], tin[to]);
-        }
-        else{
-            dfs(to, v);
-            low[v] = min(low[v], low[to]);
-            if(low[to]>=tin[v] && p!=-1){
-                articulation_pts.push_back(v);
-                components[v]++;
-            }
-            children++;
-        }
-    }
-    if(p==-1 && children>1){
-        articulation_pts.push_back(v);
-        components[v] = children - 1;
-    }
-}
-void find_articulation_pts() {
-    timer = 0;
-    visited.assign(n, 0);
-    tin.assign(n, -1);
-    components.assign(n, 1);
-    low.assign(n, -1);
-    for (int i = 0; i < n; ++i) {
-        if (!visited[i])
-            dfs (i,-1);
-    }
-}
 void solve(){
-    
+    cin >> n >> m;
+    g.resize(n + 1);
+    vis.resize(n + 1, 0);
+    dis.assign(n + 1, 1e15);
+    dis[1] = 0;
+    rep(i,0,m){
+        int u, v, w;
+        cin >> u >> v >> w;
+        g[u].push_back({v, w});
+    }
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    pq.push({0, 1});
+    while(!pq.empty()){
+        auto p = pq.top();
+        pq.pop();
+        int dd = p.F;
+        int node = p.S;
+        if(vis[node])
+        continue;
+        vis[node] = 1;
+        for(auto &np : g[node]){
+            int edge = np.S;
+            int neigh = np.F;
+            if(dis[neigh]>dis[node] + edge){
+                dis[neigh] = dis[node] + edge;
+                pq.push({dis[neigh], neigh});
+            }
+        }
+    }
+
+    mini = dis[n];
+    if(mini == 1e15){
+        cout << -1 << endl;
+        return;
+    }
+    cnt = 0;
+
+    int min_flight = 1e6, max_flights = 0;
+    dis.assign(n + 1, 1e15);
+    vis.assign(n + 1, 0);
+    vector<int>num(n+1,0);
+    num[1] = 1;
+    priority_queue<vi, vector<vi>, greater<vi>> pqv;
+    pqv.push({0, 1, 0});
+    dis[1] = 0;
+    while(!pqv.empty()){
+        auto p = pqv.top();
+        pqv.pop();
+        int dd = p[0];
+        int node = p[1];
+        int steps = p[2];
+
+        if(vis[node])
+            continue;
+        vis[node] = 1;
+        for(auto &np : g[node]){
+            int edge = np.S;
+            int neigh = np.F;
+            if(dis[neigh]>dis[node] + edge){
+                dis[neigh] = dis[node] + edge;
+                pqv.push({dis[neigh], neigh, steps+1});
+                num[neigh] = num[node];
+            }
+            else if(dis[neigh] == dis[node] + edge && neigh!=n){
+                num[neigh] += num[node];
+            }
+            else if(neigh == n && dis[node]+edge==mini){
+                num[neigh] += num[node];
+
+            }
+            if(neigh == n && dis[node]+edge==mini){
+                min_flight = min(min_flight, steps + 1);
+                max_flights = max(max_flights, steps + 1);
+            }
+        }
+    }
+    pr(num);
+    cnt = num[n];
+    cout << mini << " " << cnt << " " << min_flight << " " << max_flights << endl;
 }
 
 signed main(){

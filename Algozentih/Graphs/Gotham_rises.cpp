@@ -66,58 +66,49 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     }
     return a.first > b.first;
 };
-
-int n;
-vector<vector<int>> adj; 
-vector<bool> visited;
-vector<int> tin, low;
-int timer;
-vector<int> articulation_pts;
-vector<int> components; // No of components in intially connected graph if node "i" is deleted
-
-void dfs(int v,int p){
-    visited[v] = 1;
-    int children = 0;
-    tin[v] = low[v] = timer++;
-    for(auto  &to : adj[v]){
-        if(visited[to]){
-            low[v] = min(low[v], tin[to]);
+int n, m, r, c;
+vector<vector<int>> g;
+vector<int> vis;
+int sz;
+void dfs(int node,int par){
+    vis[node] = 1;
+    for(auto & neigh : g[node]){
+        if(neigh==par)continue;
+        if(!vis[neigh]){
+            dfs(neigh, node);
+            sz++;
         }
-        else{
-            dfs(to, v);
-            low[v] = min(low[v], low[to]);
-            if(low[to]>=tin[v] && p!=-1){
-                articulation_pts.push_back(v);
-                components[v]++;
-            }
-            children++;
-        }
-    }
-    if(p==-1 && children>1){
-        articulation_pts.push_back(v);
-        components[v] = children - 1;
-    }
-}
-void find_articulation_pts() {
-    timer = 0;
-    visited.assign(n, 0);
-    tin.assign(n, -1);
-    components.assign(n, 1);
-    low.assign(n, -1);
-    for (int i = 0; i < n; ++i) {
-        if (!visited[i])
-            dfs (i,-1);
     }
 }
 void solve(){
-    
+    cin >> n >> m >> c >> r;
+    g.clear();
+    vis.clear();
+    g.resize(n + 1);
+    vis.resize(n + 1, 0);
+    rep(i,0,m){
+        int x, y;
+        cin >> x >> y;
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+    int ans = 0;
+    rep(i,1,n+1){
+        if(!vis[i]){
+            sz = 1;
+            dfs(i, -1);
+            ans += (sz - 1) * r + c;
+            // cout << ans << endl;
+        }
+    }
+    cout << ans << endl;
 }
 
 signed main(){
     Code
     
     int _t=1;
-    // cin>>_t;
+    cin>>_t;
     while(_t--){
         solve();
     }
