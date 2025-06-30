@@ -33,12 +33,13 @@ void recur(int n, int row,int qleft){
 
     // Traversing all the choices
     // One choice to not place a queen
+
     queens.push_back(-1);
     recur(n,row+1,qleft);
     queens.pop_back();
 
     // Place the queen
-    for(int col = 0;col<n;col++){
+    for(int col = 0;col<n;col++){ // Traversing the choices
         // Checking the choice
         if(chk(row,col)){
             //Valid choice --> making the move

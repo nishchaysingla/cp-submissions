@@ -67,57 +67,41 @@ auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     return a.first > b.first;
 };
 
-int n;
-vector<vector<int>> adj; 
-vector<bool> visited;
-vector<int> tin, low;
-int timer;
-vector<int> articulation_pts;
-vector<int> components; // No of components in intially connected graph if node "i" is deleted
-
-void dfs(int v,int p){
-    visited[v] = 1;
-    int children = 0;
-    tin[v] = low[v] = timer++;
-    for(auto  &to : adj[v]){
-        if(visited[to]){
-            low[v] = min(low[v], tin[to]);
-        }
-        else{
-            dfs(to, v);
-            low[v] = min(low[v], low[to]);
-            if(low[to]>=tin[v] && p!=-1){
-                articulation_pts.push_back(v);
-                components[v]++;
-            }
-            children++;
-        }
-    }
-    if(p==-1 && children>1){
-        articulation_pts.push_back(v);
-        components[v] = children - 1;
-    }
-}
-void find_articulation_pts() {
-    timer = 0;
-    visited.assign(n, 0);
-    tin.assign(n, -1);
-    components.assign(n, 1);
-    low.assign(n, -1);
-    for (int i = 0; i < n; ++i) {
-        if (!visited[i])
-            dfs (i,-1);
-    }
-}
 void solve(){
-    
+    int n, k;
+    cin >> n >> k;
+    if(k>=n){
+        cout << 1 << endl;
+        return;
+    }
+    if(k<=1e4){
+        for (int i = k; i >= 1;i--){
+            if(n%i==0){
+                cout << n/i << endl;
+                return;
+            }
+        }
+    }
+    // cout << n / 2857 << endl;
+    int ans = n;
+    for (int i = 1; i*i <= n;i++){
+        if(n%i==0){
+            if(n/i<=k){
+                ans = min(ans, i);
+            }
+            if(i<=k){
+                ans = min(ans,n/i);
+            }
+        }
+    }
+    cout << ans << endl;
 }
 
 signed main(){
     Code
     
     int _t=1;
-    // cin>>_t;
+    cin>>_t;
     while(_t--){
         solve();
     }
