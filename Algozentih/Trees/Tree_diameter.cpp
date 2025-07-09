@@ -2,16 +2,12 @@
 #define ll long long
 #define int long long
 #define endl '\n'
-#define rep(i,a,b) for(int i = a; i < (b); ++i)
-#define rrep(i,a,b) for(int i = a; i > (b); --i)
-#define trav(x,a) for(auto& x:a)
-#define F first
-#define S second
+#define forn(i,n) for(int i = 0; i < n; i++)
 #define tk(n,v) forn(i,n){cin>>v[i];}
 #define Code ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
 #define all(vec) vec.begin(),vec.end()
-#define yo cout<<"YES"<<endl
-#define noo cout<<"NO"<<endl
+#define printy cout<<"YES"<<endl
+#define printn cout<<"NO"<<endl
 using namespace std;
 long double PI = acos(-1.0);
 int M = 1e9 + 7;
@@ -60,61 +56,49 @@ int nCr(int n , int r){
     return ans;
 }
 
+// template <typename T>
+// T maxT(T a, T b){ return (a > b) ? a : b; }
+
 auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
     if(a.first == b.first){
         return a.second < b.second;
     }
     return a.first > b.first;
+    // priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(cmp)> pq(cmp);
 };
 vector<vector<int>>g;
-vector<int>par,subtree_size,depth,num_child;
-vector<bool>is_leaf;
-void dfs(int node,int parent , int d){
+int n;
+vector<int>depth;
+void dfs(int node, int par,int d){
     depth[node] = d;
-    par[node] = parent;
-    bool leaf = true;
-    for(auto &neigh : g[node]){
-        if(neigh==parent)continue;
-        leaf = false;
-        num_child[node]++;
-        dfs(neigh,node,d+1);
-        subtree_size[node] += subtree_size[neigh];
+    for(auto & neigh : g[node]){
+        if(neigh == par)continue;
+        dfs(neigh, node, d+1);
     }
-    is_leaf[node] = leaf;
     return;
 }
 void solve(){
-    int n;cin>>n;
+    cin>>n;
     g.resize(n+1);
-    par.resize(n+1);subtree_size.assign(n+1,1);depth.resize(n+1);is_leaf.resize(n+1);num_child.resize(n+1);
-    rep(i,0,n-1){
-        int u,v;cin>>u>>v;
+    depth.resize(n+1);
+    for(int i = 0;i<n-1;i++){
+        int u , v;cin>>u>>v;
         g[u].push_back(v);
         g[v].push_back(u);
     }
     dfs(1,-1,0);
-    pr(g);
-    pr(par);
-
-    rep(i,1,n+1){
-        cout<<i<<" ";
+    int max_node = 1;
+    for(int i = 2;i<=n;i++){
+        if(depth[i]>depth[max_node]){
+            max_node = i;
+        }
     }
-    cout<<endl;
-    rep(i,1,n+1){
-        cout<<is_leaf[i]<<" ";
+    dfs(max_node,-1,0);
+    int ans = depth[max_node];
+    for(int i = 1;i<=n;i++){
+        ans = max(ans , depth[i]);
     }
-    cout<<endl;
-    rep(i,1,n+1){
-        cout<<subtree_size[i]<<" ";
-    }
-    cout<<endl;
-    rep(i,1,n+1){
-        cout<<depth[i]<<" ";
-    }
-    cout<<endl;
-    rep(i,1,n+1){
-        cout<<num_child[i]<<" ";
-    }
+    cout<<ans<<endl;
 }
 
 signed main(){
